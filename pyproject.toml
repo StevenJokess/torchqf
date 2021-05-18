@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "torchqf"
+version = "0.0.1"
+description = "PyTorch Quant Finance"
+authors = ["Shota Imaki <shota.imaki.0801@gmail.com>"]
+license = "BSD-3-Clause"
+
+[tool.poetry.dependencies]
+python = "^3.6.13"
+torch = "^1.8.1"
+
+[tool.poetry.dev-dependencies]
+black = "^21.5b1"
+isort = "^5.8.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+skip-magic-trailing-comma = true
+
+[tool.isort]
+profile = 'black'
+force_single_line = true
