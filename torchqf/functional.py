@@ -109,7 +109,7 @@ def pv(input: torch.Tensor, time, rate=0.0) -> torch.Tensor:
     return input * torch.exp(-rate * time)
 
 
-def npv(input, time, rate=0.0, keepdim=False) -> torch.Tensor:
+def npv(input:torch.Tensor, time, rate=0.0, keepdim=False) -> torch.Tensor:
     """
     Returns the net present value of a cash flowsteam (`input`).
 
@@ -124,6 +124,7 @@ def npv(input, time, rate=0.0, keepdim=False) -> torch.Tensor:
         If `float`, evenly spaced time-steps until `time`.
     rate : float | Tensor
         Instantaneous rate.
+        TODO(simaki): compound rate
     keepdim : bool, default=False
         Whether the output tensor has dim retained or not.
 
@@ -139,19 +140,30 @@ def npv(input, time, rate=0.0, keepdim=False) -> torch.Tensor:
 
     Examples
     --------
+    >>> import torchqf
+
     >>> input = torch.tensor([
     ...     [ 1.0, -0.1, -0.1, -0.1],
     ...     [ 2.0, -0.2, -0.2, -0.2]])
-    >>> npv(input, 4.0, 0.01)
+    >>> torchqf.npv(input, 4.0, 0.01)
     tensor([0.6989, 1.3978])
 
     This returns the present value for a cashflow with shape `(*, 1)`.
 
     >>> input = torch.tensor([1.0])
-    >>> npv(input, time=0.5, rate=0.01)
+    >>> torchqf.npv(input, time=0.5, rate=0.01)
     tensor(0.9950)
+
+    Net present value of a bond with 1000 face-value,
+    semiannualy accrued 2%/year coupon rate, and two-year expiry.
+    Discount rate is chosen to 5%.
+
+    >>> input = torch.tensor([10, 10, 10, 1010])
+    >>> time = torch.tensor([0.5, 1.0, 1.5, 2.0])
+    >>> torchqf.npv(input, time, rate=0.05)
+    tensor(942.4286)
     """
-    return pv(input, time, rate).sum(-1, keepdim=keepdim)
+    return pv(input, time=time, rate=rate).sum(-1, keepdim=keepdim)
 
 
 def european_payoff(input, strike=1.0, call=True, keepdim=False):
