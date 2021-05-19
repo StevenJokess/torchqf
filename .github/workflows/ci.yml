@@ -84,7 +84,7 @@ jobs:
 
     needs: lint
 
-    if: always() && needs.lint.outputs.status == 'failure'
+    if: needs.lint.outputs.status == 'failure'
 
     steps:
 

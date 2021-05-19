@@ -1,17 +1,19 @@
-name: Bump and Pull Request
+name: Bump
 
 on:
   create:
-    branches: [release/*]
+    branches:
   workflow_dispatch:
 
 jobs:
 
   bump-and-pr:
 
-    name: Bump and Pull Request
+    name: Bump
 
     runs-on: ubuntu-latest
+
+    if: contains(github.ref, 'release/')
 
     steps:
 
@@ -19,18 +21,18 @@ jobs:
 
     - uses: actions/setup-python@v2
 
-
     - name: Install poetry
       run: pip install poetry
 
     - name: Bump version
-      run: git branch --show-current | sed 's|release/||' | xargs poetry version
+      run: git branch --show-current | sed 's|release/||' | xargs poetry version | { printf '::set-output name=PR_TITLE::'; cat; }
+      id: bump
 
-    - name: Create Pull Request
+    - name: Create pull request
       uses: peter-evans/create-pull-request@v3
       with:
         author: GitHub Actions <action@github.com>
         commit-message: bump version
         delete-branch: true
         branch-suffix: short-commit-hash
-        title: 'Bump version'
+        title: ${{ steps.bump.outputs.PR_TITLE }}
