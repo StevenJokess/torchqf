@@ -136,7 +136,7 @@ def npv(input: torch.Tensor, time, rate=0.0, keepdim=False) -> torch.Tensor:
     time : :math:`(*, T)`
         The same shape with the input.
     output : :math:`(*)`
-        If `keepdims=True`, :math:`(*, T)`.
+        If `keepdims=True`, :math:`(*, 1)`.
 
     Examples
     --------
@@ -147,12 +147,6 @@ def npv(input: torch.Tensor, time, rate=0.0, keepdim=False) -> torch.Tensor:
     ...     [ 2.0, -0.2, -0.2, -0.2]])
     >>> torchqf.npv(input, 4.0, 0.01)
     tensor([0.6989, 1.3978])
-
-    This returns the present value for a cashflow with shape `(*, 1)`.
-
-    >>> input = torch.tensor([1.0])
-    >>> torchqf.npv(input, time=0.5, rate=0.01)
-    tensor(0.9950)
 
     Net present value of a bond with 1000 face-value,
     semiannualy accrued 2%/year coupon rate, and two-year expiry.
@@ -220,3 +214,28 @@ def log_return(input):
         :math:`(*, T - 1)`
     """
     return (input[..., 1:] / input[..., :-1]).log()
+
+
+def softwhere(input, x=0.0, y=1.0, width=1.0):
+    """
+    Soft version of `torch.where(input > 0, x, y)`
+
+    The operation is defined as:
+
+        out = p * x + (1 - p) * y
+        p = sigmoid(input / width)
+
+    Parameters
+    ----------
+    input : Tensor
+    threshold : float | Tensor
+    x : float | Tensor
+    y : float | Tensor
+    width : float | Tensor
+
+    Shape
+    -----
+    input : :math:`(*)`
+    """
+    p = fn.sigmoid(input / width)
+    return p * x + (1 - p) * y
