@@ -109,7 +109,7 @@ def pv(input: torch.Tensor, time, rate=0.0) -> torch.Tensor:
     return input * torch.exp(-rate * time)
 
 
-def npv(input:torch.Tensor, time, rate=0.0, keepdim=False) -> torch.Tensor:
+def npv(input: torch.Tensor, time, rate=0.0, keepdim=False) -> torch.Tensor:
     """
     Returns the net present value of a cash flowsteam (`input`).
 
