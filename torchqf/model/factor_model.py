@@ -36,18 +36,19 @@ class FactorModel(Module):
     >>> from torchqf.stochastic import generate_brownian
 
     >>> _ = torch.manual_seed(42)
+
     >>> input = generate_brownian((2, 5), 0.1)
     >>> factors = generate_brownian((2, 5), 0.1)
     >>> fm = FactorModel().fit(input, factors)
     >>> fm(input, factors)
-    tensor([[ 0.0005, -0.0086,  0.0002,  0.0113, -0.0258],
-            [-0.0297,  0.0219, -0.0166,  0.0009, -0.0183]])
+    tensor([[ 0.0032, -0.0023, -0.0046,  0.0138, -0.0099],
+            [-0.0234,  0.0157, -0.0017, -0.0052,  0.0025]])
 
     The method `fit_forward` fits and forwards at once.
 
     >>> fm.fit_forward(input, factors)
-    tensor([[ 0.0005, -0.0086,  0.0002,  0.0113, -0.0258],
-            [-0.0297,  0.0219, -0.0166,  0.0009, -0.0183]])
+    tensor([[ 0.0032, -0.0023, -0.0046,  0.0138, -0.0099],
+            [-0.0234,  0.0157, -0.0017, -0.0052,  0.0025]])
     """
 
     def __init__(self):
