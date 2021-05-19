@@ -33,5 +33,4 @@ jobs:
         commit-message: bump version
         delete-branch: true
         branch-suffix: short-commit-hash
-        base: main
-        title: ${GITHUB_REF##*/}
+        title: 'Bump version'
