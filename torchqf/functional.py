@@ -4,11 +4,24 @@ import torch.functional as fn
 from .tensor import steps
 
 
+def simple_to_compound(rate: torch.Tensor, time) -> torch.Tensor:
+    """
+    Converts simple rate into compound rate.
+
+    Parameters
+    ----------
+    rate : Tensor
+        Simple rates.
+    time : Tensor
+        Times that rates accure.
+    """
+
+
 def compound(input: torch.Tensor, dim=None, keepdim=False) -> torch.Tensor:
     """
     Returns the product of all elements in the `input` tensor.
 
-        Compound[r] = [ \prod_i (1 + r[i]) ] - 1
+        out = [ \\prod_i (1 + input[i]) ] - 1
 
     Parameters
     ----------
