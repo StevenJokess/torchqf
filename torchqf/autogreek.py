@@ -28,12 +28,13 @@ def delta(pricer, *, create_graph: bool = False, **kwargs) -> torch.Tensor:
     moneyness = kwargs.get("moneyness")
     log_moneyness = kwargs.get("log_moneyness")
 
-    if log_moneyness is not None or moneyness is not None:
-        if strike is None:
-            # Since delta does not depend on strike,
-            # assign an arbitrary value (1.0) to strike if not given.
-            strike = torch.tensor(1.0)
-            kwargs["strike"] = strike
+    if strike is None:
+        if spot is not None:
+            raise ValueError
+        # Since delta does not depend on strike,
+        # assign an arbitrary value (1.0) to strike if not given.
+        strike = torch.tensor(1.0)
+        kwargs["strike"] = strike
 
     spot = _parse_spot(
         spot=spot, moneyness=moneyness, log_moneyness=log_moneyness, strike=strike
