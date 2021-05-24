@@ -1,11 +1,7 @@
-from cmath import exp
-from cmath import log
-from logging import root
-from random import vonmisesvariate
-
 import torch
 from torch.distributions.normal import Normal
 
+from .. import autogreek
 from ._utils import _parse_log_moneyness
 from ._utils import _parse_spot
 from ._utils import root_bisect
@@ -19,11 +15,10 @@ class BlackScholesMixin:
     @property
     def N(self):
         """
-        normal dist with
+        normal dist with `pdf` method.
         """
         normal = Normal(torch.tensor(0.0), torch.tensor(1.0))
-        pdf = lambda input: normal.log_prob(input).exp()
-        setattr(normal, "pdf", pdf)
+        setattr(normal, "pdf", lambda input: normal.log_prob(input).exp())
         return normal
 
     @staticmethod
@@ -173,8 +168,8 @@ class BSEuropeanOption(BlackScholesMixin):
         return root_bisect(
             get_price,
             price,
-            lower=bisect_lower,
-            upper=bisect_upper,
+            lower=torch.tensor(bisect_lower),
+            upper=torch.tensor(bisect_upper),
             precision=precision,
             max_iter=max_iter,
         )
@@ -194,33 +189,31 @@ class BSEuropeanOption(BlackScholesMixin):
         """
         Returns Black-Scholes delta of the derivative.
 
+        Parameters
+        ----------
+        ...
+        create_graph : bool, default=False
+
         Examples
         --------
         >>> volatility = torch.tensor([0.18, 0.20, 0.22])
         >>> moneyness = torch.ones(3)
         >>> expiry = torch.ones(3)
+        >>> strike = torch.ones(3)
         >>> BSEuropeanOption().delta(
-        ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
+        ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=strike)
         tensor([0.5359, 0.5398, 0.5438])
         """
-        if log_moneyness is not None or moneyness is not None:
-            if strike is not None:
-                # Since delta does not depend on strike,
-                # assign an arbitrary value (1.0) to strike if not given.
-                strike = torch.tensor(1.0)
-
-        spot = _parse_spot(
-            spot=spot, strike=strike, moneyness=moneyness, log_moneyness=log_moneyness
-        ).requires_grad_()
-        price = self.price(
-            volatility=volatility, spot=spot, strike=strike, expiry=expiry
-        )
-        return torch.autograd.grad(
-            price,
-            inputs=spot,
-            grad_outputs=torch.ones_like(price),
+        return autogreek.delta(
+            self.price,
+            volatility=volatility,
+            expiry=expiry,
+            log_moneyness=log_moneyness,
+            moneyness=moneyness,
+            spot=spot,
+            strike=strike,
             create_graph=create_graph,
-        )[0]
+        )
 
     @torch.enable_grad()
     def gamma(
@@ -255,19 +248,13 @@ class BSEuropeanOption(BlackScholesMixin):
         ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
         tensor([2.2074, 1.9848, 1.8024])
         """
-        spot = _parse_spot(
-            spot=spot, strike=strike, moneyness=moneyness, log_moneyness=log_moneyness
-        ).requires_grad_()
-        delta = self.delta(
+        return autogreek.gamma(
+            self.price,
             volatility=volatility,
+            expiry=expiry,
+            log_moneyness=log_moneyness,
+            moneyness=moneyness,
             spot=spot,
             strike=strike,
-            expiry=expiry,
-            create_graph=True,
-        )
-        return torch.autograd.grad(
-            delta,
-            inputs=spot,
-            grad_outputs=torch.ones_like(spot),
             create_graph=create_graph,
-        )[0]
+        )

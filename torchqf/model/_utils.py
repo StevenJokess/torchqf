@@ -1,5 +1,3 @@
-from cmath import log
-
 import torch
 
 
@@ -9,18 +7,12 @@ def _parse_moneyness(
     strike: torch.Tensor = None,
     moneyness: torch.Tensor = None,
     log_moneyness: torch.Tensor = None,
-):
+) -> torch.Tensor:
     if moneyness is not None:
-        # Other parameters should not be provided, so they never contradict
-        assert log_moneyness is None
-        assert (spot is None) or (strike is None)
         return moneyness
     elif log_moneyness is not None:
-        # Other parameters should not be provided, so they never contradict
-        assert (spot is None) or (strike is None)
         return log_moneyness.exp()
     else:
-        assert (spot is not None) and (strike is not None)
         return spot / strike
 
 
@@ -29,7 +21,7 @@ def _parse_log_moneyness(
     strike: torch.Tensor = None,
     moneyness: torch.Tensor = None,
     log_moneyness: torch.Tensor = None,
-):
+) -> torch.Tensor:
     if log_moneyness is not None:
         return log_moneyness
     else:
@@ -41,29 +33,24 @@ def _parse_spot(
     strike: torch.Tensor = None,
     moneyness: torch.Tensor = None,
     log_moneyness: torch.Tensor = None,
-):
+) -> torch.Tensor:
     if spot is not None:
         return spot
     elif moneyness is not None:
-        # Other parameters should not be provided, so they never contradict
-        assert log_moneyness is None
-        assert strike is not None
         return moneyness * strike
-    elif log_moneyness is not None:
-        assert moneyness is None
-        assert strike is not None
+    else:
         return log_moneyness.exp() * strike
 
 
 def root_bisect(
     f,
     target: torch.Tensor,
-    lower,
-    upper,
-    precision=1e-10,  # TODO(simaki) determine sensible default precision
-    max_iter=10000,  # TODO(simaki) determine sensible default iter; -log2(precision)
+    lower: torch.Tensor,
+    upper: torch.Tensor,
+    precision: float = 1e-10,  # TODO(simaki) determine sensible default precision
+    max_iter: int = 10000,  # TODO(simaki) determine sensible default iter; -log2(precision)
     differentiable: bool = False,
-):
+) -> torch.Tensor:
     """
     Find root by binary search assuming f is monotone.
 
@@ -83,7 +70,7 @@ def root_bisect(
 
     if (f(lower) > f(upper)).all():
         # If decreasing function
-        mf = lambda x: -f(x)
+        mf = lambda input: -f(input)
         return root_bisect(
             mf, -target, lower, upper, precision=precision, max_iter=max_iter
         )

@@ -47,7 +47,7 @@ class FactorModel(Module):
             [-0.0234,  0.0157, -0.0017, -0.0052,  0.0025]])
     """
 
-    def fit(self, input, factor):
+    def fit(self, input, factor, enable_grad=False):
         """
         Fit the model using the asset returns (`input`) and the factor returns (`factor`).
 
@@ -57,6 +57,8 @@ class FactorModel(Module):
             Returns of assets.
         factor : Tensor
             Returns of factors.
+        enable_grad : bool, default=False
+            Flag whether to enable grad (True), or disable (False).
 
         Returns
         -------
@@ -78,11 +80,12 @@ class FactorModel(Module):
         assert input.ndim == 2, "not supported"
         assert factor.ndim == 2, "not supported"
 
-        X = factor.t()  # shape : (T, F)
-        y = input.transpose(-2, -1)  # shape : (T, A)
+        with torch.set_grad_enabled(mode=enable_grad):
+            tensor_x = factor.t()  # shape : (T, F)
+            tensor_y = input.transpose(-2, -1)  # shape : (T, A)
 
-        # Compute beta : (F, T) @ (T, A) = (F, A)
-        self.beta = torch.mm(torch.linalg.pinv(X), y)
+            # Compute beta : (F, T) @ (T, A) = (F, A)
+            self.beta = torch.mm(torch.linalg.pinv(tensor_x), tensor_y)
 
         return self
 
@@ -91,4 +94,4 @@ class FactorModel(Module):
         return input - factor_return
 
     def fit_forward(self, input: torch.Tensor, factor: torch.Tensor) -> torch.Tensor:
-        return self.fit(input, factor)(input, factor)
+        return self.fit(input, factor, enable_grad=True)(input, factor)

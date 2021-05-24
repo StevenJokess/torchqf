@@ -17,7 +17,22 @@ pip install torchqf
 
 ## Features
 
-...
+### Autogreek
+
+```py
+import torch
+import torchqf
+
+pricing_formula = torchqf.bs.BSEuropeanOption().price
+
+torchqf.autogreek.delta(
+    pricing_formula,
+    volatility=torch.tensor([0.18, 0.20, 0.22]),
+    spot=torch.ones(3),
+    expiry=torch.ones(3),
+)
+# tensor([0.5359, 0.5398, 0.5438])
+```
 
 ## Examples
 
