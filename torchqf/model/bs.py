@@ -258,3 +258,33 @@ class BSEuropeanOption(BlackScholesMixin):
             strike=strike,
             create_graph=create_graph,
         )
+
+    def theta(self, create_graph=False, **kwargs):
+        """
+        Returns Black-Scholes theta of the derivative.
+
+        Examples
+        --------
+        >>> volatility = torch.tensor([0.18, 0.20, 0.22])
+        >>> moneyness = torch.ones(3)
+        >>> expiry = torch.ones(3)
+        >>> BSEuropeanOption().theta(
+        ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
+        tensor([-0.0358, -0.0397, -0.0436])
+        """
+        return autogreek.theta(self.price, create_graph=create_graph, **kwargs)
+
+    def vega(self, create_graph=False, **kwargs):
+        """
+        Returns Black-Scholes theta of the derivative.
+
+        Examples
+        --------
+        >>> volatility = torch.tensor([0.18, 0.20, 0.22])
+        >>> moneyness = torch.ones(3)
+        >>> expiry = torch.ones(3)
+        >>> BSEuropeanOption().vega(
+        ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
+        tensor([0.3973, 0.3970, 0.3965])
+        """
+        return autogreek.vega(self.price, create_graph=create_graph, **kwargs)

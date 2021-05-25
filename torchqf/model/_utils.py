@@ -7,6 +7,8 @@ def _parse_moneyness(
     strike: torch.Tensor = None,
     moneyness: torch.Tensor = None,
     log_moneyness: torch.Tensor = None,
+    *_,
+    **__,
 ) -> torch.Tensor:
     if moneyness is not None:
         return moneyness
@@ -21,6 +23,8 @@ def _parse_log_moneyness(
     strike: torch.Tensor = None,
     moneyness: torch.Tensor = None,
     log_moneyness: torch.Tensor = None,
+    *_,
+    **__,
 ) -> torch.Tensor:
     if log_moneyness is not None:
         return log_moneyness
@@ -33,6 +37,8 @@ def _parse_spot(
     strike: torch.Tensor = None,
     moneyness: torch.Tensor = None,
     log_moneyness: torch.Tensor = None,
+    *_,
+    **__,
 ) -> torch.Tensor:
     if spot is not None:
         return spot
