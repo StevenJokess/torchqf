@@ -57,15 +57,15 @@ def root_bisect(
     max_iter: int = 10000,  # TODO(simaki) determine sensible default iter; -log2(precision)
     differentiable: bool = False,
 ) -> torch.Tensor:
-    """
-    Find root by binary search assuming f is monotone.
+    """Find root by binary search assuming f is monotone.
+
+    .. :math:
 
         f(output) = target
 
-    Parameters
-    ----------
-    f : callable[[Tensor], Tensor]
-    target : Tensor
+    Args:
+        f : callable[[Tensor], Tensor]
+        target : Tensor
     """
     assert not differentiable
 

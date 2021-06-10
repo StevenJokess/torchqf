@@ -8,15 +8,11 @@ from ._utils import root_bisect
 
 
 class BlackScholesMixin:
-    """
-    A mixin class to provide useful equations for Black Scholes
-    """
+    """A mixin class to provide useful equations for Black Scholes models."""
 
     @property
     def N(self):
-        """
-        normal dist with `pdf` method.
-        """
+        """normal distribution with `pdf` method."""
         normal = Normal(torch.tensor(0.0), torch.tensor(1.0))
         setattr(normal, "pdf", lambda input: normal.log_prob(input).exp())
         return normal
@@ -25,25 +21,7 @@ class BlackScholesMixin:
     def d1(
         volatility: torch.Tensor, log_moneyness: torch.Tensor, expiry: torch.Tensor
     ) -> torch.Tensor:
-        """
-
-        Parameters
-        ----------
-        log_moneyness : Tensor
-            ...
-        expiry : Tensor
-            ...
-        volatility : Tensor
-            ...
-
-        Returns
-        -------
-        d1 : Tensor
-
-        Shapes
-        ------
-        ...
-        """
+        """Returns `d1` of Black-Scholes formula."""
         # TODO(simaki) Use _parse_log_moneyness so users can use spot, strike
         v, s, t = map(torch.as_tensor, (volatility, log_moneyness, expiry))
         return (s + (v ** 2 / 2) * t) / (v * torch.sqrt(t))
@@ -52,6 +30,7 @@ class BlackScholesMixin:
     def d2(
         volatility: torch.Tensor, log_moneyness: torch.Tensor, expiry: torch.Tensor
     ) -> torch.Tensor:
+        """Returns `d2` of Black-Scholes formula."""
         # TODO(simaki) Use _parse_log_moneyness so users can use spot, strike
         v, s, t = map(torch.as_tensor, (volatility, log_moneyness, expiry))
         return (s - (v ** 2 / 2) * t) / (v * torch.sqrt(t))
@@ -61,9 +40,9 @@ class BSEuropeanOption(BlackScholesMixin):
     """
     Black Scholes formulas for a European option.
 
-    Parameters
-    ----------
-    is_call : bool, default=True
+    Args:
+        is_call (bool, default=True)
+            TODO(simaki)
     """
 
     def __init__(self, is_call=True):
@@ -79,20 +58,27 @@ class BSEuropeanOption(BlackScholesMixin):
         moneyness: torch.Tensor = None,
         spot: torch.Tensor = None,
     ) -> torch.Tensor:
-        """
-        Returns Black-Scholes price of European option.
+        """Returns Black-Scholes price of European option.
 
-        Examples
-        --------
-        >>> volatility = torch.tensor([0.18, 0.20, 0.22])
-        >>> moneyness = torch.ones(3)
-        >>> expiry = torch.ones(3)
-        >>> BSEuropeanOption().price(
-        ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
-        tensor([0.0717, 0.0797, 0.0876])
-        """
-        # TODO(simaki) Use _parse_log_moneyness so users can use spot, strike
+        Args:
+            TODO(simaki)
 
+        Returns:
+            TODO(simaki)
+
+        Shape:
+
+            TODO(simaki)
+
+        Examples:
+
+            >>> volatility = torch.tensor([0.18, 0.20, 0.22])
+            >>> moneyness = torch.ones(3)
+            >>> expiry = torch.ones(3)
+            >>> BSEuropeanOption().price(
+            ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
+            tensor([0.0717, 0.0797, 0.0876])
+        """
         log_moneyness = _parse_log_moneyness(
             spot=spot, strike=strike, moneyness=moneyness, log_moneyness=log_moneyness
         )
@@ -124,34 +110,41 @@ class BSEuropeanOption(BlackScholesMixin):
         bisect_upper: float = 1.0,
         max_iter: int = 100,
     ) -> torch.Tensor:
-        """
-        Returns implied volatility.
+        """Returns implied volatility.
 
-        Parameters
-        ----------
-        ...
-        differentiable : bool, default=True
-            Find root with differentiable operation
-        bisect_lower : float, default=0.001
-        bisect_upper : float, default=0.001
+        Args:
+            TODO(simaki)
+            differentiable (bool, default=True
+                Find root with differentiable operation
+            bisect_lower (float, default=0.001):
+            TODO(simaki)
+            bisect_upper (float, default=1.0):
+            TODO(simaki)
 
-        Examples
-        --------
-        >>> price = torch.tensor([0.07, 0.08, 0.09])
-        >>> moneyness = torch.ones(3)
-        >>> expiry = torch.ones(3)
-        >>> formula = BSEuropeanOption()
-        >>> iv = formula.iv(
-        ...     price=price, moneyness=moneyness, expiry=expiry, strike=1.0)
-        >>> iv
-        tensor([0.1757, 0.2009, 0.2261])
-        >>> BSEuropeanOption().price(
-        ...     volatility=iv,
-        ...     moneyness=moneyness,
-        ...     expiry=expiry,
-        ...     strike=1.0,
-        ... )
-        tensor([0.0700, 0.0800, 0.0900])
+        Returns:
+            TODO(simaki)
+
+        Shape:
+
+            TODO(simaki)
+
+        Examples:
+
+            >>> price = torch.tensor([0.07, 0.08, 0.09])
+            >>> moneyness = torch.ones(3)
+            >>> expiry = torch.ones(3)
+            >>> formula = BSEuropeanOption()
+            >>> iv = formula.iv(
+            ...     price=price, moneyness=moneyness, expiry=expiry, strike=1.0)
+            >>> iv
+            tensor([0.1757, 0.2009, 0.2261])
+            >>> BSEuropeanOption().price(
+            ...     volatility=iv,
+            ...     moneyness=moneyness,
+            ...     expiry=expiry,
+            ...     strike=1.0,
+            ... )
+            tensor([0.0700, 0.0800, 0.0900])
         """
         assert not differentiable, "not supported"
 
@@ -186,23 +179,27 @@ class BSEuropeanOption(BlackScholesMixin):
         strike: torch.Tensor = None,
         create_graph=False,
     ) -> torch.Tensor:
-        """
-        Returns Black-Scholes delta of the derivative.
+        """Returns Black-Scholes delta of the derivative.
 
-        Parameters
-        ----------
-        ...
-        create_graph : bool, default=False
+        Args:
+            TODO(simaki)
 
-        Examples
-        --------
-        >>> volatility = torch.tensor([0.18, 0.20, 0.22])
-        >>> moneyness = torch.ones(3)
-        >>> expiry = torch.ones(3)
-        >>> strike = torch.ones(3)
-        >>> BSEuropeanOption().delta(
-        ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=strike)
-        tensor([0.5359, 0.5398, 0.5438])
+        Returns:
+            TODO(simaki)
+
+        Shape:
+
+            TODO(simaki)
+
+        Examples:
+
+            >>> volatility = torch.tensor([0.18, 0.20, 0.22])
+            >>> moneyness = torch.ones(3)
+            >>> expiry = torch.ones(3)
+            >>> strike = torch.ones(3)
+            >>> BSEuropeanOption().delta(
+            ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=strike)
+            tensor([0.5359, 0.5398, 0.5438])
         """
         return autogreek.delta(
             self.price,
@@ -218,73 +215,99 @@ class BSEuropeanOption(BlackScholesMixin):
     @torch.enable_grad()
     def gamma(
         self,
-        *,
-        volatility: torch.Tensor,
-        expiry: torch.Tensor,
-        log_moneyness: torch.Tensor = None,
-        moneyness: torch.Tensor = None,
-        spot: torch.Tensor = None,
-        strike: torch.Tensor = None,
-        create_graph=False,
+        **kwargs
+        # volatility: torch.Tensor,
+        # expiry: torch.Tensor,
+        # log_moneyness: torch.Tensor = None,
+        # moneyness: torch.Tensor = None,
+        # spot: torch.Tensor = None,
+        # strike: torch.Tensor = None,
+        # create_graph=False,
     ) -> torch.Tensor:
-        """
-        Returns Black-Scholes delta of the derivative.
+        """Returns Black-Scholes gamma of the derivative.
 
-        Shapes
-        ------
-        volatility : :math:`(*)`
-        expiry : :math:`(*)`
-        log_moneyness : :math:`(*)`
-        moneyness : :math:`(*)`
-        spot : :math:`(*)`
-        strike : :math:`(*)`
+        Args:
+            TODO(simaki)
 
-        Examples
-        --------
-        >>> volatility = torch.tensor([0.18, 0.20, 0.22])
-        >>> moneyness = torch.ones(3)
-        >>> expiry = torch.ones(3)
-        >>> BSEuropeanOption().gamma(
-        ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
-        tensor([2.2074, 1.9848, 1.8024])
+        Returns:
+            TODO(simaki)
+
+
+        Shape:
+
+            - volatility : :math:`(*)`
+            - expiry : :math:`(*)`
+            - log_moneyness : :math:`(*)`
+            - moneyness : :math:`(*)`
+            - spot : :math:`(*)`
+            - strike : :math:`(*)`
+
+        Examples:
+
+            >>> volatility = torch.tensor([0.18, 0.20, 0.22])
+            >>> moneyness = torch.ones(3)
+            >>> expiry = torch.ones(3)
+            >>> BSEuropeanOption().gamma(
+            ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
+            tensor([2.2074, 1.9848, 1.8024])
         """
+        # maybe it would be better to specify the names of keyword arguments
+        # rather than using kwargs for readability for users.
         return autogreek.gamma(
             self.price,
-            volatility=volatility,
-            expiry=expiry,
-            log_moneyness=log_moneyness,
-            moneyness=moneyness,
-            spot=spot,
-            strike=strike,
-            create_graph=create_graph,
+            **kwargs
+            # volatility=volatility,
+            # expiry=expiry,
+            # log_moneyness=log_moneyness,
+            # moneyness=moneyness,
+            # spot=spot,
+            # strike=strike,
+            # create_graph=create_graph,
         )
 
     def theta(self, create_graph=False, **kwargs):
         """
         Returns Black-Scholes theta of the derivative.
 
-        Examples
-        --------
-        >>> volatility = torch.tensor([0.18, 0.20, 0.22])
-        >>> moneyness = torch.ones(3)
-        >>> expiry = torch.ones(3)
-        >>> BSEuropeanOption().theta(
-        ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
-        tensor([-0.0358, -0.0397, -0.0436])
+        Args:
+            TODO(simaki)
+
+        Returns:
+            TODO(simaki)
+
+        Shape:
+            TODO(simaki)
+
+        Examples:
+
+            >>> volatility = torch.tensor([0.18, 0.20, 0.22])
+            >>> moneyness = torch.ones(3)
+            >>> expiry = torch.ones(3)
+            >>> BSEuropeanOption().theta(
+            ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
+            tensor([-0.0358, -0.0397, -0.0436])
         """
         return autogreek.theta(self.price, create_graph=create_graph, **kwargs)
 
     def vega(self, create_graph=False, **kwargs):
-        """
-        Returns Black-Scholes theta of the derivative.
+        """Returns Black-Scholes vega of the derivative.
 
-        Examples
-        --------
-        >>> volatility = torch.tensor([0.18, 0.20, 0.22])
-        >>> moneyness = torch.ones(3)
-        >>> expiry = torch.ones(3)
-        >>> BSEuropeanOption().vega(
-        ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
-        tensor([0.3973, 0.3970, 0.3965])
+        Args:
+            TODO(simaki)
+
+        Returns:
+            TODO(simaki)
+
+        Shape:
+            TODO(simaki)
+
+        Examples:
+
+            >>> volatility = torch.tensor([0.18, 0.20, 0.22])
+            >>> moneyness = torch.ones(3)
+            >>> expiry = torch.ones(3)
+            >>> BSEuropeanOption().vega(
+            ...     volatility=volatility, moneyness=moneyness, expiry=expiry, strike=1.0)
+            tensor([0.3973, 0.3970, 0.3965])
         """
         return autogreek.vega(self.price, create_graph=create_graph, **kwargs)
