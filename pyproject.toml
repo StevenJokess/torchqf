@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "torchqf"
-version = "0.0.9"
+version = "0.0.10"
 description = "PyTorch Quant Finance"
 authors = ["Shota Imaki <shota.imaki.0801@gmail.com>"]
 license = "BSD-3-Clause"
