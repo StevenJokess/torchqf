@@ -4,31 +4,25 @@ from .model._utils import _parse_spot
 
 
 def delta(pricer, *, create_graph: bool = False, **kwargs) -> torch.Tensor:
-    """
-    Computes and returns the delta of a derivative.
+    """Computes and returns the delta of a derivative.
 
-    Parameters
-    ----------
-    pricer : callable
-        Pricing formula of a derivative.
-    create_graph : bool, default=False
-        If True, graph of the derivative will be constructed, allowing to compute higher
-        order derivative products. Default: False.
-    **kwargs
-        Other parameters passed to `pricer`.
+    Args:
+        pricer (callable): Pricing formula of a derivative.
+        create_graph (bool): If True, graph of the derivative will be
+            constructed, allowing to compute higher order derivative products.
+            Default: False.
+        **kwargs: Other parameters passed to `pricer`.
 
-    Returns
-    -------
-    greek : Tensor
-        The greek of a derivative.
+    Returns:
+        torch.Tensor: The greek of a derivative.
 
-    Examples
-    --------
-    >>> pricer = lambda spot, expiry: spot * expiry
-    >>> spot = torch.tensor([1.0, 2.0, 3.0])
-    >>> expiry = torch.tensor([2.0, 3.0, 4.0])
-    >>> delta(pricer, spot=spot, expiry=expiry)
-    tensor([2., 3., 4.])
+    Examples:
+
+        >>> pricer = lambda spot, expiry: spot * expiry
+        >>> spot = torch.tensor([1.0, 2.0, 3.0])
+        >>> expiry = torch.tensor([2.0, 3.0, 4.0])
+        >>> delta(pricer, spot=spot, expiry=expiry)
+        tensor([2., 3., 4.])
     """
     if kwargs.get("strike") is None and kwargs.get("spot") is None:
         # Since delta does not depend on strike,
@@ -55,33 +49,27 @@ def delta(pricer, *, create_graph: bool = False, **kwargs) -> torch.Tensor:
 
 
 def gamma(pricer, *, create_graph: bool = False, **kwargs) -> torch.Tensor:
-    """
-    Computes and returns the gamma of a derivative.
+    """Computes and returns the gamma of a derivative.
 
-    Parameters
-    ----------
-    pricer : callable
-        Pricing formula of a derivative.
-    create_graph : bool, default=False
-        If True, graph of the derivative will be constructed, allowing to compute higher
-        order derivative products. Default: False.
-    **kwargs
-        Other parameters passed to `pricer`.
+    Args:
+        pricer (callable): Pricing formula of a derivative.
+        create_graph (bool): If True, graph of the derivative will be
+            constructed, allowing to compute higher order derivative products.
+            Default: False.
+        **kwargs: Other parameters passed to `pricer`.
 
-    Returns
-    -------
-    greek : Tensor
-        The greek of a derivative.
+    Returns:
+        torch.Tensor: The greek of a derivative.
 
-    Examples
-    --------
-    >>> import torchqf
+    Examples:
 
-    >>> pricer = lambda spot, expiry: (spot ** 2) * expiry
-    >>> spot = torch.tensor([1.0, 2.0, 3.0])
-    >>> expiry = torch.tensor([2.0, 3.0, 4.0])
-    >>> torchqf.autogreek.gamma(pricer, spot=spot, expiry=expiry)
-    tensor([4., 6., 8.])
+        >>> import torchqf
+
+        >>> pricer = lambda spot, expiry: (spot ** 2) * expiry
+        >>> spot = torch.tensor([1.0, 2.0, 3.0])
+        >>> expiry = torch.tensor([2.0, 3.0, 4.0])
+        >>> torchqf.autogreek.gamma(pricer, spot=spot, expiry=expiry)
+        tensor([4., 6., 8.])
     """
     spot = _parse_spot(**kwargs).requires_grad_()
     kwargs["spot"] = spot
@@ -103,33 +91,31 @@ def gamma(pricer, *, create_graph: bool = False, **kwargs) -> torch.Tensor:
 
 
 def theta(pricer, *, create_graph: bool = False, **kwargs) -> torch.Tensor:
-    """
-    Computes and returns the theta of a derivative.
+    """Computes and returns the theta of a derivative.
 
-    Parameters
-    ----------
-    pricer : callable
-        Pricing formula of a derivative.
-    create_graph : bool, default=False
-        If True, graph of the derivative will be constructed, allowing to compute higher
-        order derivative products. Default: False.
-    **kwargs
-        Other parameters passed to `pricer`.
+    Note:
+        theta here is defined as the negative of the price
+        differentiated by time remaining to expiry.
 
-    Note
-    ----
-    theta here is defined as the negative of the price
-    differentiated by time remaining to expiry.
+    Args:
+        pricer (callable): Pricing formula of a derivative.
+        create_graph (bool): If True, graph of the derivative will be
+            constructed, allowing to compute higher order derivative products.
+            Default: False.
+        **kwargs: Other parameters passed to `pricer`.
 
-    Examples
-    --------
-    >>> import torchqf
+    Returns:
+        torch.Tensor: The greek of a derivative.
 
-    >>> pricer = lambda spot, expiry: spot * expiry
-    >>> spot = torch.tensor([1.0, 2.0, 3.0])
-    >>> expiry = torch.tensor([2.0, 3.0, 4.0])
-    >>> torchqf.autogreek.theta(pricer, spot=spot, expiry=expiry)
-    tensor([-1., -2., -3.])
+    Examples:
+
+        >>> import torchqf
+
+        >>> pricer = lambda spot, expiry: spot * expiry
+        >>> spot = torch.tensor([1.0, 2.0, 3.0])
+        >>> expiry = torch.tensor([2.0, 3.0, 4.0])
+        >>> torchqf.autogreek.theta(pricer, spot=spot, expiry=expiry)
+        tensor([-1., -2., -3.])
     """
     if not isinstance(kwargs.get("expiry"), torch.Tensor):
         raise ValueError
@@ -147,28 +133,24 @@ def theta(pricer, *, create_graph: bool = False, **kwargs) -> torch.Tensor:
 
 
 def vega(pricer, *, create_graph: bool = False, **kwargs) -> torch.Tensor:
-    """
-    Computes and returns the vega of a derivative.
+    """Computes and returns the vega of a derivative.
 
-    Parameters
-    ----------
-    pricer : callable
-        Pricing formula of a derivative.
-    create_graph : bool, default=False
-        If True, graph of the derivative will be constructed, allowing to compute higher
-        order derivative products. Default: False.
-    **kwargs
-        Other parameters passed to `pricer`.
+    Args:
+        pricer (callable): Pricing formula of a derivative.
+        create_graph (bool): If True, graph of the derivative will be
+            constructed, allowing to compute higher order derivative products.
+            Default: False.
+        **kwargs: Other parameters passed to `pricer`.
 
-    Examples
-    --------
-    >>> import torchqf
+    Examples:
 
-    >>> pricer = lambda spot, volatility: spot * volatility
-    >>> spot = torch.tensor([1.0, 2.0, 3.0])
-    >>> volatility = torch.tensor([2.0, 3.0, 4.0])
-    >>> torchqf.autogreek.vega(pricer, spot=spot, volatility=volatility)
-    tensor([1., 2., 3.])
+        >>> import torchqf
+
+        >>> pricer = lambda spot, volatility: spot * volatility
+        >>> spot = torch.tensor([1.0, 2.0, 3.0])
+        >>> volatility = torch.tensor([2.0, 3.0, 4.0])
+        >>> torchqf.autogreek.vega(pricer, spot=spot, volatility=volatility)
+        tensor([1., 2., 3.])
     """
     if not isinstance(kwargs.get("volatility"), torch.Tensor):
         raise ValueError

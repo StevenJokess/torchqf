@@ -16,22 +16,18 @@ class OptionStyle(Enum):
 
 
 class Option:
-    """
-    Factory class
+    """Factory class
 
-    Parameters
-    ----------
-    style : str
-        Specifies option style.
-    **kwargs
-        Parameters used to initialize the specific option.
+    Args:
+        style (str): Specifies option style.
+        **kwargs: Parameters used to initialize the specific option.
 
-    Examples
-    --------
-    >>> Option(OptionStyle.EUROPEAN, ...)
-    EuropeanOption(...)
-    >>> Option("European", ...)
-    EuropeanOption(...)
+    Examples:
+
+        >>> Option(OptionStyle.EUROPEAN, ...)
+        EuropeanOption(...)
+        >>> Option("European", ...)
+        EuropeanOption(...)
     """
 
     def __init__(self, style, *args, **kwargs):
@@ -40,15 +36,13 @@ class Option:
 
 
 class EuropeanOption:
-    """
-    European option.
+    """European option.
 
-    Parameters
-    ----------
-    underlier : Asset
-    strike : float, default=1.0
-    call : bool, default=True
-    maturity : float, default=1.0
+    Args:
+        underlier : Asset
+        strike : float, default=1.0
+        call : bool, default=True
+        maturity : float, default=1.0
     """
 
     def __init__(self, underlier, strike=1.0, call=True, maturity=1.0):
